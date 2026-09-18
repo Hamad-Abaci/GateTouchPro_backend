@@ -32,7 +32,7 @@ class LaneGroupViewSet(viewsets.ModelViewSet):
         lane_group = self.get_object()
         if direction not in ["entry", "exit"]:
           direction = "entry"
-          
+
         lanes = lane_group.lanes.all()
 
         pins = set()
@@ -47,6 +47,7 @@ class LaneGroupViewSet(viewsets.ModelViewSet):
 
         for pin in pins:
             set_status(pin)
+            print(f"Triggering GPIO pin: {pin}")
 
         for lane in lanes:
             AccessLog.objects.create(
@@ -91,6 +92,7 @@ class LaneViewSet(viewsets.ModelViewSet):
                 pin = turnstyle.exit_pin
 
             set_status(pin)
+            print(f"Triggering GPIO pin: {pin}")
 
         remarks = request.data.get("remarks")
 

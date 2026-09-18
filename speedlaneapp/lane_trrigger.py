@@ -84,7 +84,7 @@ def initialize_gpio():
     GPIO.setup(GPIO_24, GPIO.OUT)
     GPIO.setup(GPIO_25, GPIO.OUT)
     GPIO.setup(GPIO_26, GPIO.OUT)
-    GPIO.setup(GPIO_27, GPIO.OUT)
+  # GPIO.setup(GPIO_27, GPIO.OUT)
     flag =True
 
 def reset_status(gpio):
@@ -93,7 +93,7 @@ def reset_status(gpio):
 
 def set_status(gpio,delay=5):
     initialize_gpio()
-    if gpio > 27 or gpio < 0:
+    if gpio > 26 or gpio < 0:
         print("Invalid pin!")
         return
 
