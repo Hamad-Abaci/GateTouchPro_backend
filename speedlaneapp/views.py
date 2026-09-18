@@ -13,10 +13,60 @@ from .serializers import (
 )
 
 
+
 class LaneGroupViewSet(viewsets.ModelViewSet):
 
-    queryset = LaneGroup.objects.prefetch_related("lanes").all()
+    queryset = LaneGroup.objects.prefetch_related(
+        "lanes__turnstyles"
+    ).all()
+
     serializer_class = LaneGroupSerializer
+
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_path=r"trigger/(?P<direction>entry|exit)"
+    )
+    def trigger(self, request, direction, pk=None):
+
+        lane_group = self.get_object()
+        if direction not in ["entry", "exit"]:
+          direction = "entry"
+          
+        lanes = lane_group.lanes.all()
+
+        pins = set()
+
+        for lane in lanes:
+            for turnstyle in lane.turnstyles.all():
+
+                if direction == "entry":
+                    pins.add(turnstyle.entry_pin)
+                else:
+                    pins.add(turnstyle.exit_pin)
+
+        for pin in pins:
+            set_status(pin)
+
+        for lane in lanes:
+            AccessLog.objects.create(
+                lane=lane,
+                user=request.data.get("user"),
+                remarks=request.data.get("remarks")
+            )
+
+        return Response(
+            {
+                "message": "Lane group trigger started successfully",
+                "lane_group_id": lane_group.id,
+                "direction": direction
+            },
+            status=status.HTTP_200_OK
+        )
+
+
+ 
+
 
 class LaneViewSet(viewsets.ModelViewSet):
 
@@ -29,10 +79,7 @@ class LaneViewSet(viewsets.ModelViewSet):
         lane = self.get_object()
 
         if direction not in ["entry", "exit"]:
-            return Response(
-                {"error": "Invalid direction"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+          direction = "entry" 
 
         turnstyles = lane.turnstyles.all()
 
@@ -62,6 +109,8 @@ class LaneViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+
+   
 
 class TurnStyleViewSet(viewsets.ModelViewSet):
 
