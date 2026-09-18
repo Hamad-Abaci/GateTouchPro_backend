@@ -8,7 +8,73 @@ REST API for managing lanes, turnstyles, system configuration, and access logs.
 
 ---
 
-# 1. Lane API
+
+
+
+# 1. Lane Group API
+
+Lane groups are used to organize lanes.
+
+## Get all lane groups
+
+GET /api/lane-groups/
+
+Returns all lane groups.
+
+Example response:
+
+[
+    {
+        "id": 1,
+        "name": "Main Entrance",
+        "description": "Main entrance lane group"
+    }
+]
+
+## Get a single lane group
+
+GET /api/lane-groups/{id}/
+
+Example:
+
+GET /api/lane-groups/1/
+
+## Create a lane group
+
+POST /api/lane-groups/
+
+Request body:
+
+{
+    "name": "Main Entrance",
+    "description": "Main entrance lane group"
+}
+
+## Update a lane group
+
+PATCH /api/lane-groups/{id}/
+
+Example:
+
+PATCH /api/lane-groups/1/
+
+Request body:
+
+{
+    "name": "Main Entrance Updated"
+}
+
+## Delete a lane group
+
+DELETE /api/lane-groups/{id}/
+
+Example:
+
+DELETE /api/lane-groups/1/
+
+---
+
+# 2. Lane API
 
 ## Get all lanes
 
@@ -32,7 +98,9 @@ Request body:
 
 {
     "name": "Lane 1",
+    "lane_group": 1,
     "turnstyles": [1, 2],
+    "width": 60,
     "created_by": "admin"
 }
 
@@ -60,44 +128,68 @@ DELETE /api/lanes/1/
 
 ---
 
-# 2. Trigger Lane
 
-Triggers a specific lane.
+# 3. Trigger Lane
 
-PATCH /api/lanes/{id}/trigger/
+Triggers a specific lane in either entry or exit direction.
+
+## Trigger Entry
+
+PATCH /api/lanes/{id}/trigger/entry/
 
 Example:
 
-PATCH /api/lanes/1/trigger/
+PATCH /api/lanes/1/trigger/entry/
 
 Request body:
 
 {
     "user": "username",
-    "remarks": "Manual access"
+    "remarks": "Manual entry access"
+}
+
+Success Response:
+
+{
+    "message": "Lane triggered successfully",
+    "lane_id": 1,
+    "direction": "entry"
+}
+
+## Trigger Exit
+
+PATCH /api/lanes/{id}/trigger/exit/
+
+Example:
+
+PATCH /api/lanes/1/trigger/exit/
+
+Request body:
+
+{
+    "user": "username",
+    "remarks": "Manual exit access"
+}
+
+Success Response:
+
+{
+    "message": "Lane triggered successfully",
+    "lane_id": 1,
+    "direction": "exit"
 }
 
 ### Fields
 
-| Field   | Type   | Required | Description                            |
-|---------|--------|----------|----------------------------------------|
-| user    | string | No       | User who triggered the lane            |
-| remarks | string | No       | Optional information about the trigger |
-
-### Success Response
-
-{
-    "message": "Lane triggered successfully",
-    "lane_id": 1
-}
+| Field   | Type   | Required | Description                         |
+|---------|--------|----------|-------------------------------------|
+| user    | string | No       | User who triggered the lane         |
+| remarks | string | No       | Optional information about trigger  |
 
 The trigger API also creates an access log.
 
-The actual hardware trigger will be integrated later.
 
----
-
-# 3. Turnstyle API
+# 4. Turnstyle API
 
 ## Get all turnstyles
 
@@ -150,7 +242,7 @@ DELETE /api/turnstyles/1/
 
 ---
 
-# 4. System Configuration API
+# 5. System Configuration API
 
 ## Get all configurations
 
@@ -199,7 +291,7 @@ DELETE /api/system-config/1/
 
 ---
 
-# 5. Access Log API
+# 6. Access Log API
 
 Access logs contain information about lane triggers.
 
@@ -273,12 +365,18 @@ DELETE /api/access-logs/{id}/
 
 | Method |           Endpoint               | Description               |
 |--------|----------------------------------|---------------------------|
+| GET	 |  /api/lane-groups/	            | Get all lane groups       |
+| POST	 |  /api/lane-groups/	            | Create lane group         |
+| GET	 |  /api/lane-groups/{id}/	        | Get one lane group        |
+| PATCH	 |  /api/lane-groups/{id}/	        | Update lane group         |
+| DELETE |  /api/lane-groups/{id}/	        | Delete lane group         |
 | GET    | /api/lanes/                      | Get all lanes             |
 | POST   | /api/lanes/                      | Create lane               |
 | GET    | /api/lanes/{id}/                 | Get lane                  |
 | PATCH  | /api/lanes/{id}/                 | Update lane               |
 | DELETE | /api/lanes/{id}/                 | Delete lane               |
-| PATCH  | /api/lanes/{id}/trigger/         | Trigger lane              |
+| PATCH  | /api/lanes/{id}/trigger/entry/   | Trigger lane entry        |
+| PATCH  | /api/lanes/{id}/trigger/exit/    | Trigger lane Exit         | 
 | GET    | /api/turnstyles/                 | Get all turnstyles        |
 | POST   | /api/turnstyles/                 | Create turnstyle          |
 | GET    | /api/turnstyles/{id}/            | Get turnstyle             |
@@ -299,19 +397,38 @@ DELETE /api/access-logs/{id}/
 
 # Typical Frontend Flow
 
-## 1. Load lanes
+## 1. Load lane groups
+
+GET /api/lane-groups/
+
+Frontend displays the available lane groups.
+
+## 2. Load lanes
 
 GET /api/lanes/
 
 Frontend displays the available lanes.
 
-## 2. User selects a lane
+## 3. User selects a lane
 
 For example, Lane 2.
 
-## 3. Trigger the lane
+## 4. User selects direction
 
-PATCH /api/lanes/2/trigger/
+The frontend provides:
+
+- Entry
+- Exit
+
+## 5. Trigger the lane
+
+For Entry:
+
+PATCH /api/lanes/2/trigger/entry/
+
+For Exit:
+
+PATCH /api/lanes/2/trigger/exit/
 
 Request body:
 
@@ -320,16 +437,29 @@ Request body:
     "remarks": "Manual trigger"
 }
 
-## 4. Backend creates the access log
+## 6. Backend triggers the turnstile
+
+The backend determines the appropriate GPIO pin from the turnstyle configuration.
+
+For Entry:
+entry_pin is used.
+
+For Exit:
+exit_pin is used.
+
+## 7. Backend creates the access log
 
 Example:
 
 Lane: Lane 2
+
 User: username
+
 Remarks: Manual trigger
+
 Time: Current time
 
-## 5. Load access history
+## 8. Load access history
 
 GET /api/access-logs/
 
@@ -341,5 +471,5 @@ The frontend can display the access history to the user.
 
 - Django
 - Django REST Framework
-- sqllite
+- SQLite
 - REST API
