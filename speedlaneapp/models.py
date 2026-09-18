@@ -15,7 +15,7 @@ class LaneGroup(models.Model):
 
 class Lane(models.Model):
     name = models.CharField(max_length=100)
-    lane_group = models.ForeignKey("LaneGroup",null=True,default=None,on_delete=models.CASCADE,related_name="lanegroup")
+    lane_group = models.ForeignKey("LaneGroup",null=True,default=None,on_delete=models.CASCADE,related_name="lanes")
     turnstyles= models.ManyToManyField("TurnStyle",related_name="lanes")
     width= models.IntegerField(default=60)
     created_by = models.CharField(max_length=100, blank=True,null=True)
