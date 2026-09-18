@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-# from .lane_trrigger import set_status
+from .lane_trrigger import set_status
 from .models import (Lane, TurnStyle, SystemConfig, AccessLog, LaneGroup)
 
 from .serializers import (
@@ -43,7 +43,7 @@ class LaneViewSet(viewsets.ModelViewSet):
             else:
                 pin = turnstyle.exit_pin
 
-            # set_status(pin)
+            set_status(pin)
 
         remarks = request.data.get("remarks")
 
