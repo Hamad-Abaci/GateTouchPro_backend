@@ -5,9 +5,19 @@ from django.contrib.auth.models import AbstractUser
 class User(AbstractUser):
     pass
 
+class LaneGroup(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+    
+
 class Lane(models.Model):
     name = models.CharField(max_length=100)
+    lane_group = models.ForeignKey("LaneGroup",null=True,default=None,on_delete=models.CASCADE,related_name="lanegroup")
     turnstyles= models.ManyToManyField("TurnStyle",related_name="lanes")
+    width= models.IntegerField(default=60)
     created_by = models.CharField(max_length=100, blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.CharField(max_length=100,blank=True,null=True)
@@ -18,6 +28,9 @@ class Lane(models.Model):
     def __str__(self):
         return self.name
 
+
+
+    
 class TurnStyle(models.Model):
 
     TYPE_CHOICES = [

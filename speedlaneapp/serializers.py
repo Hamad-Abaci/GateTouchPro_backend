@@ -1,6 +1,12 @@
 from rest_framework import serializers
 
-from .models import Lane, TurnStyle, SystemConfig, AccessLog
+from .models import (
+    Lane,
+    LaneGroup,
+    TurnStyle,
+    SystemConfig,
+    AccessLog
+)
 
 
 class TurnStyleSerializer(serializers.ModelSerializer):
@@ -12,6 +18,12 @@ class TurnStyleSerializer(serializers.ModelSerializer):
 class LaneSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lane
+        fields = "__all__"
+
+
+class LaneGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LaneGroup
         fields = "__all__"
 
 
