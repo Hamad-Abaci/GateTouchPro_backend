@@ -99,7 +99,24 @@ Request body:
 {
     "name": "Lane 1",
     "lane_group": 1,
-    "turnstyles": [1, 2],
+    "turnstyles": [
+        {
+            "make": "CAME",
+            "model": "HG 02 S V3",
+            "type": "side",
+            "is_left": true,
+            "entry_pin": 17,
+            "exit_pin": 18
+        },
+        {
+            "make": "CAME",
+            "model": "HG 02 C V3",
+            "type": "center",
+            "is_left": false,
+            "entry_pin": 22,
+            "exit_pin": 23
+        }
+    ],
     "width": 60,
     "created_by": "admin"
 }
@@ -115,8 +132,21 @@ PATCH /api/lanes/1/
 Request body:
 
 {
-    "name": "Lane 1 Updated"
+    "name": "Lane 1 Updated",
+    "turnstyles": [
+        {
+            "id": 5,
+            "entry_pin": 25,
+            "exit_pin": 46
+        }
+    ]
 }
+
+
+Existing turnstyles can be updated by providing their `id`.
+
+If a turnstyle does not contain an `id`, a new turnstyle is created and attached to the lane.
+
 
 ## Delete a lane
 
@@ -189,7 +219,59 @@ Success Response:
 The trigger API also creates an access log.
 
 
-# 4. Turnstyle API
+
+# 4. Trigger Lane Group
+
+Triggers all lanes belonging to a lane group.
+
+## Trigger Entry
+
+PATCH /api/lane-groups/{id}/trigger/entry/
+
+Example:
+
+PATCH /api/lane-groups/1/trigger/entry/
+
+Request body:
+
+{
+    "user": "username",
+    "remarks": "Manual group entry access"
+}
+
+Success Response:
+
+{
+    "message": "Lane group trigger started successfully",
+    "lane_group_id": 1,
+    "direction": "entry"
+}
+
+## Trigger Exit
+
+PATCH /api/lane-groups/{id}/trigger/exit/
+
+Example:
+
+PATCH /api/lane-groups/1/trigger/exit/
+
+Request body:
+
+{
+    "user": "username",
+    "remarks": "Manual group exit access"
+}
+
+Success Response:
+
+{
+    "message": "Lane group trigger started successfully",
+    "lane_group_id": 1,
+    "direction": "exit"
+}
+
+
+# 5. Turnstyle API
 
 ## Get all turnstyles
 
@@ -242,7 +324,7 @@ DELETE /api/turnstyles/1/
 
 ---
 
-# 5. System Configuration API
+# 6. System Configuration API
 
 ## Get all configurations
 
@@ -291,7 +373,7 @@ DELETE /api/system-config/1/
 
 ---
 
-# 6. Access Log API
+# 7. Access Log API
 
 Access logs contain information about lane triggers.
 
@@ -363,35 +445,37 @@ DELETE /api/access-logs/{id}/
 
 # API Summary
 
-| Method |           Endpoint               | Description               |
-|--------|----------------------------------|---------------------------|
-| GET	 |  /api/lane-groups/	            | Get all lane groups       |
-| POST	 |  /api/lane-groups/	            | Create lane group         |
-| GET	 |  /api/lane-groups/{id}/	        | Get one lane group        |
-| PATCH	 |  /api/lane-groups/{id}/	        | Update lane group         |
-| DELETE |  /api/lane-groups/{id}/	        | Delete lane group         |
-| GET    | /api/lanes/                      | Get all lanes             |
-| POST   | /api/lanes/                      | Create lane               |
-| GET    | /api/lanes/{id}/                 | Get lane                  |
-| PATCH  | /api/lanes/{id}/                 | Update lane               |
-| DELETE | /api/lanes/{id}/                 | Delete lane               |
-| PATCH  | /api/lanes/{id}/trigger/entry/   | Trigger lane entry        |
-| PATCH  | /api/lanes/{id}/trigger/exit/    | Trigger lane Exit         | 
-| GET    | /api/turnstyles/                 | Get all turnstyles        |
-| POST   | /api/turnstyles/                 | Create turnstyle          |
-| GET    | /api/turnstyles/{id}/            | Get turnstyle             |
-| PATCH  | /api/turnstyles/{id}/            | Update turnstyle          |
-| DELETE | /api/turnstyles/{id}/            | Delete turnstyle          |
-| GET    | /api/system-config/              | Get system configurations |
-| POST   | /api/system-config/              | Create configuration      |
-| GET    | /api/system-config/{id}/         | Get configuration         |
-| PATCH  | /api/system-config/{id}/         | Update configuration      |
-| DELETE | /api/system-config/{id}/         | Delete configuration      |
-| GET    | /api/access-logs/                | Get all access logs       |
-| POST   | /api/access-logs/                | Create access log         |
-| GET    | /api/access-logs/{id}/           | Get access log            |
-| PATCH  | /api/access-logs/{id}/           | Update access log         |
-| DELETE | /api/access-logs/{id}/           | Delete access log         |
+| Method |           Endpoint                   | Description               |
+|--------|--------------------------------------|---------------------------|
+| GET	 |  /api/lane-groups/	                | Get all lane groups       |
+| POST	 |  /api/lane-groups/	                | Create lane group         |
+| GET	 |  /api/lane-groups/{id}/	            | Get one lane group        |
+| PATCH	 |  /api/lane-groups/{id}/	            | Update lane group         |
+| DELETE |  /api/lane-groups/{id}/	            | Delete lane group         |
+| GET    | /api/lanes/                          | Get all lanes             |
+| POST   | /api/lanes/                          | Create lane               |
+| GET    | /api/lanes/{id}/                     | Get lane                  |
+| PATCH  | /api/lanes/{id}/                     | Update lane               |
+| DELETE | /api/lanes/{id}/                     | Delete lane               |
+| PATCH  | /api/lanes/{id}/trigger/entry/       | Trigger lane entry        |
+| PATCH  | /api/lanes/{id}/trigger/exit/        | Trigger lane exit         |
+| PATCH  | /api/lane-groups/{id}/trigger/entry/ | Trigger lane group entry  |
+| PATCH  | /api/lane-groups/{id}/trigger/exit/  | Trigger lane group exit   |
+| GET    | /api/turnstyles/                     | Get all turnstyles        |
+| POST   | /api/turnstyles/                     | Create turnstyle          |
+| GET    | /api/turnstyles/{id}/                | Get turnstyle             |
+| PATCH  | /api/turnstyles/{id}/                | Update turnstyle          |
+| DELETE | /api/turnstyles/{id}/                | Delete turnstyle          |
+| GET    | /api/system-config/                  | Get system configurations |
+| POST   | /api/system-config/                  | Create configuration      |
+| GET    | /api/system-config/{id}/             | Get configuration         |
+| PATCH  | /api/system-config/{id}/             | Update configuration      |
+| DELETE | /api/system-config/{id}/             | Delete configuration      |
+| GET    | /api/access-logs/                    | Get all access logs       |
+| POST   | /api/access-logs/                    | Create access log         |
+| GET    | /api/access-logs/{id}/               | Get access log            |
+| PATCH  | /api/access-logs/{id}/               | Update access log         |
+| DELETE | /api/access-logs/{id}/               | Delete access log         |
 
 ---
 
