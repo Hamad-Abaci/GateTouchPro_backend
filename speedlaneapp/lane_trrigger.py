@@ -91,14 +91,15 @@ def reset_status(gpio):
     GPIO.output(gpio, OFF_STATUS)
 
 
-def set_status(gpio,delay=5):
+def set_status(gpio,delay):
     initialize_gpio()
     if gpio > 26 or gpio < 0:
         print("Invalid pin!")
         return
 
     GPIO.output(gpio, ON_STATUS)
-    timer = threading.Timer(delay, lambda: reset_status(gpio))
+    delay_seconds = delay / 1000
+    timer = threading.Timer(delay_seconds, lambda: reset_status(gpio))
     timer.start()
 
 

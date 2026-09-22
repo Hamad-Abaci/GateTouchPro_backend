@@ -1,21 +1,37 @@
-# Turnstile Management API
+# GateTouchPro Turnstile Management API
 
-REST API for managing lanes, turnstyles, system configuration, and access logs.
+This project exposes a REST API for managing lanes, turnstiles, system configuration, and access logs for a turnstile control system.
 
 ## Base URL
+
+Use the following base path for all API requests:
 
 /api/
 
 ---
 
+## Overview
 
+The API supports the following core resources:
 
+- Lane groups
+- Lanes
+- Turnstiles
+- Trigger actions for entry and exit
+- System configuration
+- Access logs
+
+The documentation below outlines the available endpoints, request payloads, and example responses.
+
+---
 
 # 1. Lane Group API
 
-Lane groups are used to organize lanes.
+Lane groups are used to organize lanes by area or section.
 
-## Get all lane groups
+## 1.1 Get all lane groups
+
+Request:
 
 GET /api/lane-groups/
 
@@ -23,15 +39,19 @@ Returns all lane groups.
 
 Example response:
 
+```json
 [
-    {
-        "id": 1,
-        "name": "Main Entrance",
-        "description": "Main entrance lane group"
-    }
+  {
+    "id": 1,
+    "name": "Main Entrance",
+    "description": "Main entrance lane group"
+  }
 ]
+```
 
-## Get a single lane group
+## 1.2 Get a single lane group
+
+Request:
 
 GET /api/lane-groups/{id}/
 
@@ -39,18 +59,24 @@ Example:
 
 GET /api/lane-groups/1/
 
-## Create a lane group
+## 1.3 Create a lane group
+
+Request:
 
 POST /api/lane-groups/
 
 Request body:
 
+```json
 {
-    "name": "Main Entrance",
-    "description": "Main entrance lane group"
+  "name": "Main Entrance",
+  "description": "Main entrance lane group"
 }
+```
 
-## Update a lane group
+## 1.4 Update a lane group
+
+Request:
 
 PATCH /api/lane-groups/{id}/
 
@@ -60,11 +86,15 @@ PATCH /api/lane-groups/1/
 
 Request body:
 
+```json
 {
-    "name": "Main Entrance Updated"
+  "name": "Main Entrance Updated"
 }
+```
 
-## Delete a lane group
+## 1.5 Delete a lane group
+
+Request:
 
 DELETE /api/lane-groups/{id}/
 
@@ -76,13 +106,19 @@ DELETE /api/lane-groups/1/
 
 # 2. Lane API
 
-## Get all lanes
+Lanes represent a physical passage and may contain one or more turnstiles.
+
+## 2.1 Get all lanes
+
+Request:
 
 GET /api/lanes/
 
 Returns all lanes.
 
-## Get a single lane
+## 2.2 Get a single lane
+
+Request:
 
 GET /api/lanes/{id}/
 
@@ -90,38 +126,42 @@ Example:
 
 GET /api/lanes/1/
 
-## Create a lane
+## 2.3 Create a lane
+
+Request:
 
 POST /api/lanes/
 
 Request body:
 
+```json
 {
-    "name": "Lane 1",
-    "lane_group": 1,
-    "turnstyles": [
-        {
-            "make": "CAME",
-            "model": "HG 02 S V3",
-            "type": "side",
-            "is_left": true,
-            "entry_pin": 17,
-            "exit_pin": 18
-        },
-        {
-            "make": "CAME",
-            "model": "HG 02 C V3",
-            "type": "center",
-            "is_left": false,
-            "entry_pin": 22,
-            "exit_pin": 23
-        }
-    ],
-    "width": 60,
-    "created_by": "admin"
+  "name": "Lane 1",
+  "lane_group": 1,
+  "turnstyles": [
+    {
+      "make": "CAME",
+      "model": "HG 02 S V3",
+      "type": "side",
+      "is_left": true
+    },
+    {
+      "make": "CAME",
+      "model": "HG 02 C V3",
+      "type": "center",
+      "is_left": false
+    }
+  ],
+  "width": 60,
+  "entry_pin": 17,
+  "exit_pin": 18,
+  "created_by": "admin"
 }
+```
 
-## Update a lane
+## 2.4 Update a lane
+
+Request:
 
 PATCH /api/lanes/{id}/
 
@@ -131,24 +171,29 @@ PATCH /api/lanes/1/
 
 Request body:
 
+```json
 {
-    "name": "Lane 1 Updated",
-    "turnstyles": [
-        {
-            "id": 5,
-            "entry_pin": 25,
-            "exit_pin": 46
-        }
-    ]
+  "name": "Lane 1 Updated",
+  "turnstyles": [
+    {
+      "id": 5,
+      "model": "HG 02 S V3",
+      "is_left": true
+    }
+  ],
+  "entry_pin": 17,
+  "exit_pin": 18
 }
+```
 
+Notes:
 
-Existing turnstyles can be updated by providing their `id`.
+- Existing turnstiles can be updated by providing their `id`.
+- If a turnstile does not include an `id`, a new turnstile is created and attached to the lane.
 
-If a turnstyle does not contain an `id`, a new turnstyle is created and attached to the lane.
+## 2.5 Delete a lane
 
-
-## Delete a lane
+Request:
 
 DELETE /api/lanes/{id}/
 
@@ -158,12 +203,13 @@ DELETE /api/lanes/1/
 
 ---
 
-
 # 3. Trigger Lane
 
-Triggers a specific lane in either entry or exit direction.
+This action triggers a specific lane in either the entry or exit direction.
 
-## Trigger Entry
+## 3.1 Trigger entry
+
+Request:
 
 PATCH /api/lanes/{id}/trigger/entry/
 
@@ -173,20 +219,26 @@ PATCH /api/lanes/1/trigger/entry/
 
 Request body:
 
+```json
 {
-    "user": "username",
-    "remarks": "Manual entry access"
+  "user": "username",
+  "remarks": "Manual entry access"
 }
+```
 
-Success Response:
+Success response:
 
+```json
 {
-    "message": "Lane triggered successfully",
-    "lane_id": 1,
-    "direction": "entry"
+  "message": "Lane triggered successfully",
+  "lane_id": 1,
+  "direction": "entry"
 }
+```
 
-## Trigger Exit
+## 3.2 Trigger exit
+
+Request:
 
 PATCH /api/lanes/{id}/trigger/exit/
 
@@ -196,35 +248,43 @@ PATCH /api/lanes/1/trigger/exit/
 
 Request body:
 
+```json
 {
-    "user": "username",
-    "remarks": "Manual exit access"
+  "user": "username",
+  "remarks": "Manual exit access"
 }
+```
 
-Success Response:
+Success response:
 
+```json
 {
-    "message": "Lane triggered successfully",
-    "lane_id": 1,
-    "direction": "exit"
+  "message": "Lane triggered successfully",
+  "lane_id": 1,
+  "direction": "exit"
 }
+```
 
-### Fields
+### Trigger fields
 
-| Field   | Type   | Required | Description                         |
-|---------|--------|----------|-------------------------------------|
-| user    | string | No       | User who triggered the lane         |
-| remarks | string | No       | Optional information about trigger  |
+| Field | Type | Required | Description |
+|---|---|---:|---|
+| user | string | No | User who triggered the lane |
+| remarks | string | No | Optional information about the trigger |
+| entry_pin | integer | Yes | GPIO pin used for entry |
+| exit_pin | integer | Yes | GPIO pin used for exit |
 
-The trigger API also creates an access log.
+The trigger endpoint also creates an access log entry.
 
-
+---
 
 # 4. Trigger Lane Group
 
-Triggers all lanes belonging to a lane group.
+This action triggers all lanes inside a lane group.
 
-## Trigger Entry
+## 4.1 Trigger entry for lane group
+
+Request:
 
 PATCH /api/lane-groups/{id}/trigger/entry/
 
@@ -234,20 +294,26 @@ PATCH /api/lane-groups/1/trigger/entry/
 
 Request body:
 
+```json
 {
-    "user": "username",
-    "remarks": "Manual group entry access"
+  "user": "username",
+  "remarks": "Manual group entry access"
 }
+```
 
-Success Response:
+Success response:
 
+```json
 {
-    "message": "Lane group trigger started successfully",
-    "lane_group_id": 1,
-    "direction": "entry"
+  "message": "Lane group trigger started successfully",
+  "lane_group_id": 1,
+  "direction": "entry"
 }
+```
 
-## Trigger Exit
+## 4.2 Trigger exit for lane group
+
+Request:
 
 PATCH /api/lane-groups/{id}/trigger/exit/
 
@@ -257,27 +323,36 @@ PATCH /api/lane-groups/1/trigger/exit/
 
 Request body:
 
+```json
 {
-    "user": "username",
-    "remarks": "Manual group exit access"
+  "user": "username",
+  "remarks": "Manual group exit access"
 }
+```
 
-Success Response:
+Success response:
 
+```json
 {
-    "message": "Lane group trigger started successfully",
-    "lane_group_id": 1,
-    "direction": "exit"
+  "message": "Lane group trigger started successfully",
+  "lane_group_id": 1,
+  "direction": "exit"
 }
+```
 
+---
 
 # 5. Turnstyle API
 
-## Get all turnstyles
+## 5.1 Get all turnstiles
+
+Request:
 
 GET /api/turnstyles/
 
-## Get a single turnstyle
+## 5.2 Get a single turnstile
+
+Request:
 
 GET /api/turnstyles/{id}/
 
@@ -285,22 +360,26 @@ Example:
 
 GET /api/turnstyles/1/
 
-## Create a turnstyle
+## 5.3 Create a turnstile
+
+Request:
 
 POST /api/turnstyles/
 
 Request body:
 
+```json
 {
-    "make": "CAME",
-    "model": "HG 02",
-    "type": "center",
-    "is_left": false,
-    "entry_pin": 10,
-    "exit_pin": 11
+  "make": "CAME",
+  "model": "HG 02",
+  "type": "center",
+  "is_left": false
 }
+```
 
-## Update a turnstyle
+## 5.4 Update a turnstile
+
+Request:
 
 PATCH /api/turnstyles/{id}/
 
@@ -308,7 +387,9 @@ Example:
 
 PATCH /api/turnstyles/1/
 
-## Delete a turnstyle
+## 5.5 Delete a turnstile
+
+Request:
 
 DELETE /api/turnstyles/{id}/
 
@@ -316,7 +397,7 @@ Example:
 
 DELETE /api/turnstyles/1/
 
-### Turnstyle Types
+### Supported turnstile types
 
 - center
 - side
@@ -326,11 +407,17 @@ DELETE /api/turnstyles/1/
 
 # 6. System Configuration API
 
-## Get all configurations
+System configuration stores runtime settings such as Wi-Fi details and trigger timing.
+
+## 6.1 Get all configurations
+
+Request:
 
 GET /api/system-config/
 
-## Get a configuration
+## 6.2 Get a configuration
+
+Request:
 
 GET /api/system-config/{id}/
 
@@ -338,18 +425,33 @@ Example:
 
 GET /api/system-config/1/
 
-## Create configuration
+## 6.3 Create a configuration
+
+Request:
 
 POST /api/system-config/
 
 Request body:
 
+```json
 {
-    "wifi_ssid": "MyWiFi",
-    "wifi_password": "password123"
+  "wifi_ssid": "MyWiFi",
+  "wifi_password": "password123",
+  "trigger_delay": 5000
 }
+```
 
-## Update configuration
+Note: `trigger_delay` is expressed in milliseconds.
+
+Examples:
+
+- 5000 ms = 5 seconds
+- 3000 ms = 3 seconds
+- 1000 ms = 1 second
+
+## 6.4 Update a configuration
+
+Request:
 
 PATCH /api/system-config/{id}/
 
@@ -359,11 +461,15 @@ PATCH /api/system-config/1/
 
 Request body:
 
+```json
 {
-    "wifi_ssid": "NewWiFi"
+  "wifi_ssid": "NewWiFi"
 }
+```
 
-## Delete configuration
+## 6.5 Delete a configuration
+
+Request:
 
 DELETE /api/system-config/{id}/
 
@@ -375,20 +481,32 @@ DELETE /api/system-config/1/
 
 # 7. Access Log API
 
-Access logs contain information about lane triggers.
+Access logs track trigger events and contain information related to lane actions.
 
-Each log contains:
+Each log includes:
 
 - Lane
 - User
 - Remarks
 - Triggered time
 
-## Get all access logs
+## 7.1 Get all access logs
+
+Request:
 
 GET /api/access-logs/
 
 Logs are returned with the newest entries first.
+
+---
+
+## Notes
+
+- All endpoints are relative to the base URL `/api/`.
+- The API uses standard HTTP methods such as `GET`, `POST`, `PATCH`, and `DELETE`.
+- Trigger endpoints generate access log entries automatically.
+
+This document serves as a reference for the current turnstile management API behavior and endpoint structure.
 
 Example response:
 
@@ -523,13 +641,15 @@ Request body:
 
 ## 6. Backend triggers the turnstile
 
-The backend determines the appropriate GPIO pin from the turnstyle configuration.
+The backend determines the appropriate GPIO pin from the lane configuration.
 
-For Entry:
-entry_pin is used.
+For Entry: 
+lane.entry_pin is used.
 
-For Exit:
-exit_pin is used.
+For Exit: 
+lane.exit_pin is used.
+
+The trigger delay is obtained from SystemConfig.trigger_delay and is specified in milliseconds.
 
 ## 7. Backend creates the access log
 

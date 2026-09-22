@@ -18,6 +18,8 @@ class Lane(models.Model):
     lane_group = models.ForeignKey("LaneGroup",null=True,default=None,on_delete=models.CASCADE,related_name="lanes")
     turnstyles= models.ManyToManyField("TurnStyle",related_name="lanes")
     width= models.IntegerField(default=60)
+    entry_pin = models.IntegerField()
+    exit_pin = models.IntegerField()
     created_by = models.CharField(max_length=100, blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.CharField(max_length=100,blank=True,null=True)
@@ -42,8 +44,6 @@ class TurnStyle(models.Model):
     model = models.CharField(max_length=100,default="UNKNOWN")
     type = models.CharField(max_length=30,choices=TYPE_CHOICES)
     is_left = models.BooleanField(default=False)
-    entry_pin = models.IntegerField()
-    exit_pin = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.CharField(max_length=100,blank=True,null=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -56,11 +56,11 @@ class TurnStyle(models.Model):
 
 
 
-
 class SystemConfig(models.Model):
-
-    wifi_ssid = models.CharField(max_length=100)
-    wifi_password = models.CharField(max_length=255)
+    id = models.IntegerField(primary_key=True, default=1,editable=False)
+    wifi_ssid = models.CharField(max_length=100, default="Abaci")
+    wifi_password = models.CharField(max_length=255, default="Abcd123")
+    trigger_delay = models.IntegerField(default=5000)
 
     def __str__(self):
         return self.wifi_ssid

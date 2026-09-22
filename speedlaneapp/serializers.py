@@ -27,6 +27,8 @@ class LaneSerializer(serializers.ModelSerializer):
             "lane_group",
             "turnstyles",
             "width",
+            "entry_pin",
+            "exit_pin",
             "created_by",
             "created_at",
             "updated_by",
@@ -49,7 +51,7 @@ class LaneSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         turnstyles_data = validated_data.pop("turnstyles", None)
 
-        # Update Lane fields
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 

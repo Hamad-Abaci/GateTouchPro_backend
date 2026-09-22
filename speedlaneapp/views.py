@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from .lane_trrigger import set_status
+# from .lane_trrigger import set_status
 from .models import (Lane, TurnStyle, SystemConfig, AccessLog, LaneGroup)
 
 from .serializers import (
@@ -38,16 +38,16 @@ class LaneGroupViewSet(viewsets.ModelViewSet):
         pins = set()
 
         for lane in lanes:
-            for turnstyle in lane.turnstyles.all():
 
-                if direction == "entry":
-                    pins.add(turnstyle.entry_pin)
-                else:
-                    pins.add(turnstyle.exit_pin)
-
+            if direction == "entry":
+                pins.add(lane.entry_pin)
+            else:
+                pins.add(lane.exit_pin)
+        config = SystemConfig.objects.get(pk=1)
+        delay=config.trigger_delay
         for pin in pins:
-            set_status(pin)
-            print(f"Triggering GPIO pin: {pin}")
+            # set_status(pin, delay)
+            print(f"Triggering GPIO pin: {pin} for {delay} ms")
 
         for lane in lanes:
             AccessLog.objects.create(
@@ -81,18 +81,16 @@ class LaneViewSet(viewsets.ModelViewSet):
 
         if direction not in ["entry", "exit"]:
           direction = "entry" 
+        config = SystemConfig.objects.get(pk=1)
+        delay=config.trigger_delay
 
-        turnstyles = lane.turnstyles.all()
+        if direction == "entry":
+            pin = lane.entry_pin
+        else:
+            pin = lane.exit_pin
 
-        for turnstyle in turnstyles:
-
-            if direction == "entry":
-                pin = turnstyle.entry_pin
-            else:
-                pin = turnstyle.exit_pin
-
-            set_status(pin)
-            print(f"Triggering GPIO pin: {pin}")
+        # set_status(pin,delay)
+        print(f"Triggering GPIO pin: {pin} for {delay} ms")
 
         remarks = request.data.get("remarks")
 
