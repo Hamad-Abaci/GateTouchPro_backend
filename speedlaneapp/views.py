@@ -1,7 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-# from .lane_trrigger import set_status
+from .lane_trrigger import set_status
 from .models import (Lane, TurnStyle, SystemConfig, AccessLog, LaneGroup)
 
 from .serializers import (
@@ -46,7 +46,7 @@ class LaneGroupViewSet(viewsets.ModelViewSet):
         config = SystemConfig.objects.get(pk=1)
         delay=config.trigger_delay
         for pin in pins:
-            # set_status(pin, delay)
+            set_status(pin, delay)
             print(f"Triggering GPIO pin: {pin} for {delay} ms")
 
         for lane in lanes:
@@ -89,7 +89,7 @@ class LaneViewSet(viewsets.ModelViewSet):
         else:
             pin = lane.exit_pin
 
-        # set_status(pin,delay)
+        set_status(pin,delay)
         print(f"Triggering GPIO pin: {pin} for {delay} ms")
 
         remarks = request.data.get("remarks")
