@@ -25,45 +25,76 @@ class LaneGroupViewSet(viewsets.ModelViewSet):
     @action(
         detail=True,
         methods=["patch"],
-        url_path=r"trigger/(?P<direction>entry|exit)"
+        url_path="trigger/emergency"
     )
-    def trigger(self, request, direction, pk=None):
+    def trigger_emergency(self, request, pk=None):
 
         lane_group = self.get_object()
-        if direction not in ["entry", "exit"]:
-          direction = "entry"
 
-        lanes = lane_group.lanes.all()
+        config = SystemConfig.get_config()
+        delay = config.trigger_delay
 
-        pins = set()
+        pin = lane_group.emergency_pin
 
-        for lane in lanes:
+        set_status(pin, delay)
 
-            if direction == "entry":
-                pins.add(lane.entry_pin)
-            else:
-                pins.add(lane.exit_pin)
-        config = SystemConfig.objects.get(pk=1)
-        delay=config.trigger_delay
-        for pin in pins:
-            set_status(pin, delay)
-            print(f"Triggering GPIO pin: {pin} for {delay} ms")
-
-        for lane in lanes:
-            AccessLog.objects.create(
-                lane=lane,
-                user=request.data.get("user"),
-                remarks=request.data.get("remarks")
-            )
+        print(
+            f"Triggering emergency GPIO pin: "
+            f"{pin} for {delay} ms"
+        )
+        AccessLog.objects.create(
+        lane_group=lane_group,
+        user=request.data.get("user"),
+        type="emergency",
+        remarks=request.data.get("remarks")
+    )
 
         return Response(
             {
-                "message": "Lane group trigger started successfully",
+                "message": "Emergency trigger started successfully",
                 "lane_group_id": lane_group.id,
-                "direction": direction
+                "pin": pin
             },
             status=status.HTTP_200_OK
         )
+
+
+    @action(
+        detail=True,
+        methods=["patch"],
+        url_path="trigger/fire"
+    )
+    def trigger_fire(self, request, pk=None):
+
+        lane_group = self.get_object()
+
+        config = SystemConfig.get_config()
+        delay = config.trigger_delay
+
+        pin = lane_group.fire_pin
+
+        set_status(pin, delay)
+
+        print(
+            f"Triggering fire GPIO pin: "
+            f"{pin} for {delay} ms"
+        )
+        AccessLog.objects.create(
+        lane_group=lane_group,
+        user=request.data.get("user"),
+        type="fire",
+        remarks=request.data.get("remarks")
+    )
+
+        return Response(
+            {
+                "message": "Fire trigger started successfully",
+                "lane_group_id": lane_group.id,
+                "pin": pin
+            },
+            status=status.HTTP_200_OK
+        )
+
 
 
  
@@ -81,7 +112,7 @@ class LaneViewSet(viewsets.ModelViewSet):
 
         if direction not in ["entry", "exit"]:
           direction = "entry" 
-        config = SystemConfig.objects.get(pk=1)
+        config = SystemConfig.get_config()
         delay=config.trigger_delay
 
         if direction == "entry":
@@ -97,6 +128,7 @@ class LaneViewSet(viewsets.ModelViewSet):
         AccessLog.objects.create(
             lane=lane,
             user=request.data.get("user"),
+            type="normal",
             remarks=remarks
         )
 
@@ -126,5 +158,5 @@ class SystemConfigViewSet(viewsets.ModelViewSet):
 
 class AccessLogViewSet(viewsets.ModelViewSet):
 
-    queryset = AccessLog.objects.select_related("lane").order_by("-triggered_at")
+    queryset = AccessLog.objects.select_related("lane","lane_group").order_by("-triggered_at")
     serializer_class = AccessLogSerializer
