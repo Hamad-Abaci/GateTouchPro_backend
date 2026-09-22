@@ -61,7 +61,7 @@ class TurnStyle(models.Model):
 class SystemConfig(models.Model):
     id = models.IntegerField(primary_key=True, default=1,editable=False)
     wifi_ssid = models.CharField(max_length=100, default="Abaci")
-    wifi_password = models.CharField(max_length=255, default="Abcd123")
+    wifi_password = models.CharField(max_length=255, default="Abcd@123")
     trigger_delay = models.IntegerField(default=5000)
 
     @classmethod
