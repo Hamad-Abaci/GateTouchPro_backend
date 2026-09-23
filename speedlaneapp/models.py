@@ -8,8 +8,8 @@ class User(AbstractUser):
 class LaneGroup(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True, null=True)
-    emergency_pin=models.IntegerField()
-    fire_pin=models.IntegerField()
+    emergency_pin=models.IntegerField(null=True,blank=True)
+    fire_pin=models.IntegerField(null=True,blank=True)
 
     def __str__(self):
         return self.name
