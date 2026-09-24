@@ -87,6 +87,17 @@ def initialize_gpio():
   # GPIO.setup(GPIO_27, GPIO.OUT)
     flag =True
 
+
+def set_all_pins_off():
+    initialize_gpio()
+
+    for gpio in range(1, 27):
+        GPIO.output(gpio, OFF_STATUS)
+
+    print("All GPIO pins set to OFF")
+
+
+
 def reset_status(gpio):
     GPIO.output(gpio, OFF_STATUS)
 
@@ -101,6 +112,7 @@ def set_status(gpio,delay):
     delay_seconds = delay / 1000
     timer = threading.Timer(delay_seconds, lambda: reset_status(gpio))
     timer.start()
+
 
 
 # def test_blink():
