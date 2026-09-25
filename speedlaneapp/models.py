@@ -22,6 +22,7 @@ class Lane(models.Model):
     width= models.IntegerField(default=60)
     entry_pin = models.IntegerField( null=True, blank=True)
     exit_pin = models.IntegerField(null=True,blank=True)
+    delay = models.IntegerField(null=True,blank=True,default=5000)
     created_by = models.CharField(max_length=100, blank=True,null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_by = models.CharField(max_length=100,blank=True,null=True)

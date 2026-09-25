@@ -112,8 +112,12 @@ class LaneViewSet(viewsets.ModelViewSet):
 
         if direction not in ["entry", "exit"]:
           direction = "entry" 
-        config = SystemConfig.get_config()
-        delay=config.trigger_delay
+        lane_delay =lane.delay
+        if lane_delay:
+            delay=lane_delay
+        else:
+            config = SystemConfig.get_config()
+            delay=config.trigger_delay
 
         if direction == "entry":
             pin = lane.entry_pin

@@ -29,6 +29,7 @@ class LaneSerializer(serializers.ModelSerializer):
             "width",
             "entry_pin",
             "exit_pin",
+            "delay",
             "created_by",
             "created_at",
             "updated_by",
